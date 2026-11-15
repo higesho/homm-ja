@@ -14,7 +14,7 @@ GOG.com で販売されている版を対象にしています。
 
 | 作品 | 状態 | ダウンロード |
 |---|---|---|
-| ヒーローズ・オブ・マイト・アンド・マジック3（Heroes of Might and Magic 3 Complete） | 公開中 | [HoMM3_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm3-v1.0) |
+| ヒーローズ・オブ・マイト・アンド・マジック3（Heroes of Might and Magic 3 Complete / Horn of the Abyss） | 公開中 | [HoMM3_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm3-v1.1) |
 
 入れ方と外し方は、サイトの各作品のページをご覧ください。
 どのパッチも、ゲームのファイルを書き換えません。配布物には原作のプログラムやデータは入っていません。
@@ -28,4 +28,4 @@ GOG.com で販売されている版を対象にしています。
 - 東雲フォント: パブリックドメインのビットマップフォント。
 - 美咲フォント: Copyright (C) 2002-2021 Num Kadoma。自由に利用・複製・再配布できるフリーソフトウエアです。
 - BIZ UDゴシック: Copyright 2022 The BIZ UDGothic Project Authors。SIL Open Font License 1.1（大きい見出しの文字に使用）。
-- Heroes of Might and Magic は Ubisoft Entertainment の商標です。ゲームの画像・文章の権利は原作の権利者にあります。
+- Heroes of Might and Magic は Ubisoft Entertainment の商標です。Horn of the Abyss は HotA Crew による作品です。ゲームの画像・文章の権利は原作の権利者にあります。
