@@ -14,7 +14,7 @@ GOG.com で販売されている版を対象にしています。
 
 | 作品 | 状態 | ダウンロード |
 |---|---|---|
-| ヒーローズ・オブ・マイト・アンド・マジック3（Heroes of Might and Magic 3 Complete / Horn of the Abyss） | 公開中 | [HoMM3_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm3-v1.1) |
+| ヒーローズ・オブ・マイト・アンド・マジック3（Heroes of Might and Magic 3 Complete / Horn of the Abyss） | 公開中 | [HoMM3_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm3-v1.2) |
 
 入れ方と外し方は、サイトの各作品のページをご覧ください。
 どのパッチも、ゲームのファイルを書き換えません。配布物には原作のプログラムやデータは入っていません。
