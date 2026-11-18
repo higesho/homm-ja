@@ -20,7 +20,7 @@ GOG.com で販売されている版を対象にしています（ヒーローズ
 | ヒーローズ・オブ・マイト・アンド・マジック4（Heroes of Might and Magic 4: Complete） | 公開中 | [HoMM4_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm4-v1.0) |
 | ヒーローズ・オブ・マイト・アンド・マジック5（Heroes of Might and Magic V / Hammers of Fate / Tribes of the East） | 公開中 | [HoMM5_JP.zip ほか](https://github.com/higesho/homm-ja/releases/tag/homm5-v1.0) |
 | マイト・アンド・マジック ヒーローズ6（Might & Magic Heroes VI、Steam 版） | 公開中 | [HoMM6_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm6-v1.0) |
-| マイト・アンド・マジック ヒーローズ7（Might & Magic Heroes VII / Trial by Fire、Steam 版） | 公開中 | [HoMM7_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm7-v1.0) |
+| マイト・アンド・マジック ヒーローズ7（Might & Magic Heroes VII / Trial by Fire、Steam 版） | 公開中 | [HoMM7_JP.zip ほか](https://github.com/higesho/homm-ja/releases/tag/homm7-v1.1) |
 
 入れ方と外し方は、サイトの各作品のページをご覧ください。
 どのパッチも、ゲームのファイルを書き換えません。配布物には原作のプログラムやデータは入っていません。
