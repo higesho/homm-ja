@@ -14,7 +14,7 @@ GOG.com で販売されている版を対象にしています（ヒーローズ
 
 | 作品 | 状態 | ダウンロード |
 |---|---|---|
-| ヒーローズ・オブ・マイト・アンド・マジック（Heroes of Might and Magic） | 公開中 | [HoMM1_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm1-v1.1) |
+| ヒーローズ・オブ・マイト・アンド・マジック（Heroes of Might and Magic） | 公開中 | [HoMM1_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm1-v1.2) |
 | ヒーローズ・オブ・マイト・アンド・マジック2（Heroes of Might and Magic 2 Gold） | 公開中 | [HoMM2_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm2-v1.1) |
 | ヒーローズ・オブ・マイト・アンド・マジック3（Heroes of Might and Magic 3 Complete / Horn of the Abyss） | 公開中 | [HoMM3_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm3-v1.2) |
 | ヒーローズ・オブ・マイト・アンド・マジック4（Heroes of Might and Magic 4: Complete） | 公開中 | [HoMM4_JP.zip](https://github.com/higesho/homm-ja/releases/tag/homm4-v1.0) |
