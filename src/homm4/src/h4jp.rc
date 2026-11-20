@@ -1,0 +1,4 @@
+#include <windows.h>
+1 H4JP "../build/tr.bin"
+2 H4JP "../build/h4jp_font.ttf"
+3 H4JP "../build/ts.bin"

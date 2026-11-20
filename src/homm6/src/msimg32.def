@@ -1,0 +1,7 @@
+LIBRARY msimg32
+EXPORTS
+    AlphaBlend=p_AlphaBlend
+    DllInitialize=p_DllInitialize
+    GradientFill=p_GradientFill
+    TransparentBlt=p_TransparentBlt
+    vSetDdrawflag=p_vSetDdrawflag

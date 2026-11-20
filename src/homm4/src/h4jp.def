@@ -1,0 +1,6 @@
+LIBRARY wsock32
+EXPORTS
+getsockopt=p_getsockopt @7
+recv=p_recv @16
+recvfrom=p_recvfrom @17
+setsockopt=p_setsockopt @21
