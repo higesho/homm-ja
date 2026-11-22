@@ -8,7 +8,6 @@
 #include <intrin.h>
 
 int g_test;
-int g_hota;
 static HMODULE g_self;
 static FILE *g_log;
 static CRITICAL_SECTION g_logcs;
@@ -109,7 +108,7 @@ static HANDLE (WINAPI *o_CreateFileA)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTE
 static HANDLE WINAPI h_CreateFileA(LPCSTR p, DWORD a, DWORD s, LPSECURITY_ATTRIBUTES sa, DWORD c, DWORD f, HANDLE t)
 {
     const char *r = p ? txt_redirect(p) : 0;
-    if (!r && p && g_hota) r = dat_redirect(p, _ReturnAddress());
+    if (!r && p && A->hota) r = dat_redirect(p, _ReturnAddress());
     if (g_test > 1) logf_("open %s%s%s", p ? p : "(null)", r ? " -> " : "", r ? r : "");
     return o_CreateFileA(r ? r : p, a, s, sa, c, f, t);
 }
@@ -117,7 +116,7 @@ static HANDLE (WINAPI *o_CreateFileW)(LPCWSTR, DWORD, DWORD, LPSECURITY_ATTRIBUT
 static HANDLE WINAPI h_CreateFileW(LPCWSTR p, DWORD a, DWORD s, LPSECURITY_ATTRIBUTES sa, DWORD c, DWORD f, HANDLE t)
 {
     if (g_test > 1 && p) logf_("openW %ls", p);
-    if (p && g_hota) {
+    if (p && A->hota) {
         char pa[MAX_PATH * 2]; const char *r;
         WideCharToMultiByte(CP_ACP, 0, p, -1, pa, sizeof pa, 0, 0);
         r = dat_redirect(pa, _ReturnAddress());
@@ -212,28 +211,11 @@ static int game_ok(void)
     return 0;
 }
 
-/* h3hota.exe は HotA.dll を読み込む追加の入口から始まる。素の SoD 3.2 の exe（HD Mod が本編用の
-   「Heroes3 HD.exe」にするものも同じ）は元の入口 0x61a884 から始まる。exe の名前では見分けない
-   （HD Mod では名前を自由に付けられ、HotA は本編のフォルダに重ねて入れることも多い）。 */
-static int detect_hota(void)
-{
-    uint8_t *b = (uint8_t *)0x400000; char p[MAX_PATH], *s;
-    IMAGE_NT_HEADERS *nt = (IMAGE_NT_HEADERS *)(b + ((IMAGE_DOS_HEADER *)b)->e_lfanew);
-    if (GetModuleHandleA("HotA.dll")) return 1;
-    if (nt->OptionalHeader.AddressOfEntryPoint == 0x21a884) return 0;
-    GetModuleFileNameA(0, p, MAX_PATH);
-    s = strrchr(p, 92); if (!s) return 0;
-    strcpy(s + 1, "HotA.dll");
-    return GetFileAttributesA(p) != INVALID_FILE_ATTRIBUTES;
-}
-
 static void init(void)
 {
     char buf[MAX_PATH];
     if (GetEnvironmentVariableA("H3JP_TEST", buf, sizeof buf)) g_test = atoi(buf) ? atoi(buf) : 1;
     if (!game_ok()) { logf_("not the expected Heroes3.exe; patch disabled"); return; }
-    g_hota = A->hota && detect_hota();
-    logf_("HotA: %d, HD Mod: %d", g_hota, GetModuleHandleA("_hd3_.dll") != 0);
     text_init();
     font_init();
     hook_jmp(A->strncpy_, h_strncpy);
@@ -242,9 +224,9 @@ static void init(void)
     txt_redirect_init();
     o_CreateFileA = A->hota ? api_hook("kernel32.dll", "CreateFileA", h_CreateFileA)
                             : iat_hook("kernel32.dll", "CreateFileA", h_CreateFileA);
-    if (g_hota) o_CreateFileW = api_hook("kernel32.dll", "CreateFileW", h_CreateFileW);
+    if (A->hota) o_CreateFileW = api_hook("kernel32.dll", "CreateFileW", h_CreateFileW);
     txt_hook_init();
-    if (!A->hota) subs_init();     /* 字幕は Complete の exe だけ（HD Mod の下で掛けるとロゴの動画が止まる） */
+    if (!A->hota) subs_init();
     o_GetFileAttributesA = iat_hook("kernel32.dll", "GetFileAttributesA", h_GetFileAttributesA);
     if (g_test) { test_init(); AddVectoredExceptionHandler(1, veh); }
     logf_("init done (test=%d)", g_test);
@@ -278,8 +260,7 @@ BOOL WINAPI DllMain(HINSTANCE h, DWORD r, LPVOID x)
         GetModuleFileNameA(0, exe, MAX_PATH);
         b = strrchr(exe, '\\'); b = b ? b + 1 : exe;
         logf_("loaded into %s", exe);
-        (void)b;
-        init();     /* exe の名前は問わない（中身は game_ok() で確かめる） */
+        if (!_stricmp(b, "Heroes3.exe") || !_stricmp(b, "h3hota.exe") || !_stricmp(b, "h3hota HD.exe")) init();
     }
     return TRUE;
 }

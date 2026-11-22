@@ -17,9 +17,6 @@ typedef struct {
     int hota;
 } Addrs;
 extern const Addrs *A;
-/* A->hota = SoD 3.2 の番地の並び（h3hota.exe と、HD Mod がどの版でも動かす SoD 3.2 の exe）。
-   g_hota = Horn of the Abyss そのもの（専用の TXT 一式と HotA.dat を持つ） */
-extern int g_hota;
 
 /* main.c */
 extern int g_test;
