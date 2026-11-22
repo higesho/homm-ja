@@ -134,8 +134,8 @@ void txt_hook_init(void)
 {
     DWORD sz; const uint8_t *r; uint32_t n, i;
     if (!A->hota) return;
-    r = res_get(5, &sz);
-    if (!r || memcmp(r, "H3TX", 4)) { logf_("no HotA txt resource"); return; }
+    r = res_get(g_hota ? 5 : 3, &sz);     /* HotA は専用の TXT 一式、本編は Complete と同じ TXT を使う */
+    if (!r || memcmp(r, "H3TX", 4)) { logf_("no txt resource"); return; }
     n = *(uint32_t *)(r + 4);
     for (i = 0; i < n && g_nmt < 160; i++) {
         const uint8_t *e = r + 8 + i * 32;
@@ -146,7 +146,7 @@ void txt_hook_init(void)
     }
     o_tbl = make_tramp(A->txt_table, 5); hook_jmp(A->txt_table, h_tbl);
     o_file = make_tramp(A->txt_file, 5); hook_jmp(A->txt_file, h_file);
-    logf_("HotA txt files: %d", g_nmt);
+    logf_("txt files for the SoD 3.2 exe (%s): %d", g_hota ? "HotA" : "base game", g_nmt);
 }
 
 /* ---- HotA.dat: rebuilt with translated strings, handed to HotA.dll only ---- */
