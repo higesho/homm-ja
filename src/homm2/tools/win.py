@@ -70,7 +70,7 @@ def click(x, y, right=False):
 def start(variant):
     dst = os.path.join(GAME, 'DOSBOX', 'winmm.dll')
     if os.path.exists(dst): os.remove(dst)
-    if variant == 'jp': shutil.copy(os.path.join(ROOT, 'build', 'winmm.dll'), dst)
+    if variant == 'jp': shutil.copy(os.path.join(ROOT, 'build', 'test', 'winmm.dll'), dst)   # 試験版（src\build.bat test）
     dbx = os.path.join(GAME, 'DOSBOX')
     p = subprocess.Popen([os.path.join(dbx, 'DOSBox.exe'), '-conf', os.path.join(ROOT, 'test', os.environ.get('H2CONF', 'test.conf')), '-noconsole'], cwd=dbx)
     open(PIDF, 'w').write(str(p.pid))

@@ -7,9 +7,12 @@
 #include <stdlib.h>
 #include <intrin.h>
 
-int g_test;
 int g_hota;
 static HMODULE g_self;
+
+#ifdef H3JP_TEST
+/* 試験版だけ: H3JP_TEST で試験の仕組みを入れ、H3JP_LOG のファイルに記録を書く */
+int g_test;
 static FILE *g_log;
 static CRITICAL_SECTION g_logcs;
 
@@ -22,6 +25,7 @@ void logf_(const char *fmt, ...)
     fputc('\n', g_log); fflush(g_log);
     LeaveCriticalSection(&g_logcs);
 }
+#endif
 
 void patch_bytes(uint32_t at, const void *b, int n)
 {
@@ -140,11 +144,15 @@ static int __fastcall h_ReadString(void *st, H3Str *s)
     if (r > 0 && s->s && s->len) {
         uint32_t n; const char *j = tr_lookup(s->s, s->len, &n);
         if (j) ((void (__fastcall *)(H3Str *, void *, const char *, int))A->str_assign)(s, 0, j, n);
+#ifdef H3JP_TEST
         else if (g_test) logf_("MAPSTR|%.*s", (int)(s->len > 300 ? 300 : s->len), s->s);
+#endif
     }
     return r;
 }
 
+#ifdef H3JP_TEST
+/* 試験版だけ: 落ちたときの番地を記録する */
 static LONG CALLBACK veh(EXCEPTION_POINTERS *e)
 {
     static int n;
@@ -162,6 +170,7 @@ static LONG CALLBACK veh(EXCEPTION_POINTERS *e)
     }
     return EXCEPTION_CONTINUE_SEARCH;
 }
+#endif
 
 /* 0x618a10 strncpy: same as CRT, but never leave half of a 2-byte EUC character at the cut
    (hero names are char[13], scenario names/descriptions are cut at 60/300 bytes, ...) */
@@ -229,8 +238,10 @@ static int detect_hota(void)
 
 static void init(void)
 {
+#ifdef H3JP_TEST
     char buf[MAX_PATH];
     if (GetEnvironmentVariableA("H3JP_TEST", buf, sizeof buf)) g_test = atoi(buf) ? atoi(buf) : 1;
+#endif
     if (!game_ok()) { logf_("not the expected Heroes3.exe; patch disabled"); return; }
     g_hota = A->hota && detect_hota();
     logf_("HotA: %d, HD Mod: %d", g_hota, GetModuleHandleA("_hd3_.dll") != 0);
@@ -246,7 +257,9 @@ static void init(void)
     txt_hook_init();
     if (!A->hota) subs_init();     /* 字幕は Complete の exe だけ（HD Mod の下で掛けるとロゴの動画が止まる） */
     o_GetFileAttributesA = iat_hook("kernel32.dll", "GetFileAttributesA", h_GetFileAttributesA);
+#ifdef H3JP_TEST
     if (g_test) { test_init(); AddVectoredExceptionHandler(1, veh); }
+#endif
     logf_("init done (test=%d)", g_test);
 }
 
@@ -268,17 +281,17 @@ STUB(0, p_getsockopt) STUB(1, p_recv) STUB(2, p_recvfrom) STUB(3, p_setsockopt)
 BOOL WINAPI DllMain(HINSTANCE h, DWORD r, LPVOID x)
 {
     if (r == DLL_PROCESS_ATTACH) {
-        char exe[MAX_PATH], *b;
-        char lb[MAX_PATH];
         g_self = h;
         DisableThreadLibraryCalls(h);
-        InitializeCriticalSection(&g_logcs);
-        if (GetEnvironmentVariableA("H3JP_LOG", lb, sizeof lb)) g_log = fopen(lb, "w");
+#ifdef H3JP_TEST
+        {   char exe[MAX_PATH], lb[MAX_PATH];
+            InitializeCriticalSection(&g_logcs);
+            if (GetEnvironmentVariableA("H3JP_LOG", lb, sizeof lb)) g_log = fopen(lb, "w");
+            GetModuleFileNameA(0, exe, MAX_PATH);
+            logf_("loaded into %s", exe);
+        }
+#endif
         load_real();
-        GetModuleFileNameA(0, exe, MAX_PATH);
-        b = strrchr(exe, '\\'); b = b ? b + 1 : exe;
-        logf_("loaded into %s", exe);
-        (void)b;
         init();     /* exe の名前は問わない（中身は game_ok() で確かめる） */
     }
     return TRUE;

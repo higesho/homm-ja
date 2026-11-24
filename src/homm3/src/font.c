@@ -259,6 +259,7 @@ static const uint8_t *xl(const uint8_t *t)
     return j ? (const uint8_t *)j : t;
 }
 
+#ifdef H3JP_TEST
 /* test mode: log drawn strings that still look English (once each) */
 static void note_untr(const uint8_t *t)
 {
@@ -274,6 +275,7 @@ static void note_untr(const uint8_t *t)
     if (n < 4096) seen[n++] = h;
     logf_("UNTR|%s", t);
 }
+#endif
 /* 0x4b5490 TextDraw(text, pcx, x, y, w, h, color, align, cursor) */
 static void __fastcall TextDraw(void *f, void *edx, const uint8_t *t, void *pcx, int x, int y, int w, int h,
                                 int color, int align, int cursor);
@@ -291,7 +293,9 @@ static void __fastcall TextDraw(void *f, void *edx, const uint8_t *t, void *pcx,
     int fh = FH(f), yoff = 0, s = 0, e, nx, lw, xo, len;
     if (!t) return;
     t = xl(t);
+#ifdef H3JP_TEST
     if (g_test) note_untr(t);
+#endif
     len = (int)strlen((const char *)t);
     if (!len) {
         if (cursor != -1) { if (color & 0x100) color &= ~0x100; else color += 9; draw_sb(f, '_', pcx, x, y, color); }

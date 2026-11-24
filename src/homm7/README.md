@@ -5,7 +5,7 @@
 ## 組み立て方
 1. `python tools/build.py` で言語ファイルを作る
 2. `python tools/make_fonts.py all` でフォントのパッケージを作る
-3. `sh tools/build_dll.sh` で build/dinput8.dll を作る（64 ビット）
+3. `sh tools/build_dll.sh` で build/dinput8.dll（配布版）と build/test/dinput8.dll（試験版。/DH7TEST 付きで tools/win.py が使う。配布しない）を作る（64 ビット）
 
 ## 用意するもの
 - Windows、Visual Studio 2022（cl・rc）、Python 3

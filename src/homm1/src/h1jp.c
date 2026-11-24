@@ -20,8 +20,13 @@ void proxy_init(void);
 
 /* ---------------------------------------------------------------- logging */
 static char g_dir[MAX_PATH];
-static FILE *g_log;
 static int g_logon;
+#ifndef H1JP_TEST
+/* 配布版: 記録は書かない */
+#define dbg(...) ((void)0)
+#else
+/* 試験版: 記録（log.txt）を書く */
+static FILE *g_log;
 static void dbg(const char *fmt, ...)
 {
     va_list ap;
@@ -37,6 +42,7 @@ static void dbg(const char *fmt, ...)
     va_end(ap);
     fflush(g_log);
 }
+#endif
 
 /* ------------------------------------------------- DOSBox internals */
 static uint32_t g_dbx, g_dbx_code;   /* Steam 0.74-3 = 0, GOG 0.74-2.1 = +0xe000 / -0x10, SVN = +0x3b000 / +0xbc0 */
@@ -313,8 +319,12 @@ static uint32_t wrapbrk(uint32_t font)
     } else R_EIP += 1;
     return 0;
 }
+#ifdef H1JP_TEST
 static uint32_t g_cnt[8];
 #define CNT(i) do { if (g_logon > 1 && (++g_cnt[i] & 0xffff) == 0) dbg("cb%d x%u eip %x\n", i, g_cnt[i], R_EIP); } while (0)
+#else
+#define CNT(i) ((void)0)
+#endif
 static uint32_t __cdecl cb_wrap1(void) { CNT(3); return wrapbrk(rd(PHYS_SS + R_EBP - 0x30)); }
 static uint32_t __cdecl cb_wrap2(void) { CNT(4); return wrapbrk(0); }
 
@@ -389,7 +399,10 @@ static uint32_t __cdecl cb_entry(void)
     g_o2ptr = rd(L1(O1_REF)) - O2_REF_TARGET;
     g_o2 = PHYS_DS + g_o2ptr;
     dbg("entry: code at %x, data at %x (ptr %x)\n", g_o1, g_o2, g_o2ptr);
-    if (!GetEnvironmentVariableA("H1JP_NOENGINE", NULL, 0)) {   /* text engine */
+#ifdef H1JP_TEST
+    if (!GetEnvironmentVariableA("H1JP_NOENGINE", NULL, 0))     /* 試験版: 文字の処理の書き換えを止められる */
+#endif
+    {   /* text engine */
         static const uint8_t c_orig[] = {0xe8};
         static const uint8_t w1_orig[] = {0x83, 0xf9, 0x20, 0x74};
         static const uint8_t n1_orig[] = {0x66, 0x8b, 0x40, 0x0e, 0x46, 0x01, 0xc1};
@@ -439,7 +452,10 @@ static uint32_t __cdecl cb_entry(void)
             if (rd(L1(sites[k])) == g_o2ptr + 0x20ac4) wd(L1(sites[k]), g_o2ptr + copy);
             else dbg("name site %x mismatch\n", sites[k]);
     }
-    if (!GetEnvironmentVariableA("H1JP_NOSTR", NULL, 0)) apply_strings();
+#ifdef H1JP_TEST
+    if (!GetEnvironmentVariableA("H1JP_NOSTR", NULL, 0))        /* 試験版: 訳の書き込みを止められる */
+#endif
+        apply_strings();
     REG32(9) |= 0x200;      /* sti */
     R_ESP &= ~3u;
     return 0;
@@ -709,6 +725,8 @@ static int hook_iat(void)
     return done;
 }
 
+#ifdef H1JP_TEST
+/* 試験版: H1JP_TRACE で、ゲームが今どこを動いているかを 1 秒ごとに記録する */
 static DWORD WINAPI eip_thread(LPVOID p)
 {
     (void)p;
@@ -717,13 +735,16 @@ static DWORD WINAPI eip_thread(LPVOID p)
         if (g_o1) dbg("eip %x (obj1 %x) cs %x esp %x\n", R_EIP, PHYS_CS + R_EIP - g_o1, PHYS_CS, R_ESP);
     }
 }
+#endif
 
 static void init(HMODULE self)
 {
     char la[MAX_PATH];
     HMODULE crt;
     InitializeCriticalSection(&g_cs);
-    if (GetEnvironmentVariableA("H1JP_OFF", la, MAX_PATH)) return;
+#ifdef H1JP_TEST
+    if (GetEnvironmentVariableA("H1JP_OFF", la, MAX_PATH)) return;   /* 試験版: 日本語化を止められる */
+#endif
     if (!GetEnvironmentVariableA("LOCALAPPDATA", la, MAX_PATH)) return;
     wsprintfA(g_dir, "%s\\H1JP", la);
     CreateDirectoryA(g_dir, NULL);
@@ -735,7 +756,9 @@ static void init(HMODULE self)
     if (!real_fopen) return;
     if (!hook_iat()) return;
     g_enabled = 1;
+#ifdef H1JP_TEST
     if (GetEnvironmentVariableA("H1JP_TRACE", NULL, 0)) CreateThread(NULL, 0, eip_thread, NULL, 0, NULL);
+#endif
     dbg("HoMM1 JP patch active, blob %08X, DOSBox +%x\n", g_blob_crc, g_dbx);
 }
 

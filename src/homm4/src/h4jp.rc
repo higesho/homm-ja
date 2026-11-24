@@ -1,4 +1,31 @@
+#pragma code_page(65001)
 #include <windows.h>
 1 H4JP "../build/tr.bin"
 2 H4JP "../build/h4jp_font.ttf"
 3 H4JP "../build/ts.bin"
+
+1 VERSIONINFO
+FILEVERSION 1,1,0,0
+PRODUCTVERSION 1,1,0,0
+FILEOS 0x40004L
+FILETYPE VFT_DLL
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "041104B0"
+    BEGIN
+      VALUE "CompanyName", "higesho"
+      VALUE "ProductName", "ヒーローズ・オブ・マイト・アンド・マジック4 日本語化パッチ（非公式）"
+      VALUE "FileDescription", "ヒーローズ・オブ・マイト・アンド・マジック4 日本語化パッチ（非公式）"
+      VALUE "FileVersion", "1.1.0.0"
+      VALUE "ProductVersion", "1.1"
+      VALUE "InternalName", "HoMM4_JP"
+      VALUE "OriginalFilename", "wsock32.dll"
+      VALUE "Comments", "https://higesho.github.io/homm-ja/homm4/"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0411, 1200
+  END
+END

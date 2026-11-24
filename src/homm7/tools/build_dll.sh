@@ -4,14 +4,16 @@
 J="$(cd "$(dirname "$0")/.." && pwd)"
 T="${TEMP:-/tmp}/h7jp_build"
 rm -rf "$T"; mkdir -p "$T"
-cp "$J"/src/*.c "$J"/src/*.inc "$J"/src/*.def "$T"/
+cp "$J"/src/*.c "$J"/src/*.inc "$J"/src/*.def "$J"/src/*.rc "$T"/
+# h7jp.rc = バージョン情報（配布版・試験版とも）
 cat > "$T/b.bat" <<'B'
 @echo off
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
 cd /d "%~dp0"
 mkdir test 2>nul
-cl /nologo /O2 /MT /W3 /utf-8 /LD /GS- h7jp.c /Fedinput8.dll /link /DEF:dinput8.def kernel32.lib user32.lib || exit /b 1
-cl /nologo /O2 /MT /W3 /utf-8 /LD /GS- /DH7TEST /D_CRT_SECURE_NO_WARNINGS h7jp.c /Fotest\ /Fetest\dinput8.dll /link /DEF:dinput8.def kernel32.lib user32.lib dxguid.lib || exit /b 1
+rc /nologo /fo h7jp.res h7jp.rc || exit /b 1
+cl /nologo /O2 /MT /W3 /utf-8 /LD /GS- h7jp.c h7jp.res /Fedinput8.dll /link /DEF:dinput8.def kernel32.lib user32.lib || exit /b 1
+cl /nologo /O2 /MT /W3 /utf-8 /LD /GS- /DH7TEST /D_CRT_SECURE_NO_WARNINGS h7jp.c h7jp.res /Fotest\ /Fetest\dinput8.dll /link /DEF:dinput8.def kernel32.lib user32.lib dxguid.lib || exit /b 1
 B
 cmd //c "$(cygpath -w "$T")\b.bat" || exit 1
 mkdir -p "$J/build/test"; cp "$T/dinput8.dll" "$J/build/"; cp "$T/test/dinput8.dll" "$J/build/test/"

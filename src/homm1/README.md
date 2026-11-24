@@ -4,7 +4,7 @@ DOSBox 用の winmm.dll です。起動時に HEROES.EXE と地図・AGG を日�
 
 ## 組み立て方
 1. `python tools/make_patch.py` で build/patch.bin（字形・訳・差分）を作る
-2. `src\build.bat` で build/winmm.dll を作る
+2. `src\build.bat` で build/winmm.dll（配布版）を作る。`src\build.bat test` で試験版の build/test/winmm.dll を作る（tools/win.py が使う。配布しない）
 3. winmm.dll をゲームの DOSBOX フォルダに置く
 
 ## 用意するもの

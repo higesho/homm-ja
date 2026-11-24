@@ -53,9 +53,11 @@ void text_init(void)
     }
     r = res_get(3, &sz);
     if (r && !memcmp(r, "H4TS", 4)) { g_nspec = *(uint32_t *)(r + 4); g_spec = (const TSpec *)(r + 8); }
+#ifdef H4JP_TEST
     {   char b[8];
         if (g_test && GetEnvironmentVariableA("H4JP_NOTR", b, sizeof b)) g_n = 0;   /* test: English text */
     }
+#endif
     logf_("strings: %u, tables: %u", g_n, g_nspec);
 }
 
@@ -66,6 +68,8 @@ typedef char (__cdecl *read_string_t)(void *, mstr *);
 typedef char (__fastcall *grow_t)(mstr *, void *, uint32_t, char);   /* __thiscall bool _Grow(size_t, bool) */
 static read_string_t o_read;
 static grow_t s_grow = (grow_t)0x401df0;
+#ifdef H4JP_TEST
+/* 試験版だけ: H4JP_DUMP のファイルに、読み込んだ文字列を書き出す */
 static HANDLE g_dumpf;
 
 static void dump(const mstr *s, uint32_t tag)
@@ -74,6 +78,9 @@ static void dump(const mstr *s, uint32_t tag)
     if (!g_dumpf) return;
     WriteFile(g_dumpf, &z, 4, &w, 0); WriteFile(g_dumpf, s->ptr, s->len, &w, 0);
 }
+#else
+#define dump(s, tag) ((void)0)
+#endif
 
 static void replace(mstr *s, const char *t, uint32_t tl)
 {
@@ -108,7 +115,8 @@ static char __cdecl h_read(void *st, mstr *s)
     return r;
 }
 
-/* rows are only dumped (H4JP_DUMP); translation happens per table */
+#ifdef H4JP_TEST
+/* rows are only dumped (H4JP_DUMP); translation happens per table（試験版だけ） */
 typedef char (__cdecl *read_row_t)(void *, mvec *);
 static read_row_t o_row;
 static char __cdecl h_row(void *st, mvec *v)
@@ -119,6 +127,7 @@ static char __cdecl h_row(void *st, mvec *v)
         for (s = v->first; s < v->last; s++) if (s->ptr && s->len) dump(s, 0x80000000u);
     return r;
 }
+#endif
 
 static uint64_t row_sig(uint64_t h, const mvec *r)
 {
@@ -143,10 +152,12 @@ static void translate_table(mtab *t)
     if (nrows > 1) h = row_sig(h, &t->first[1]);
     for (i = 0; i < g_nspec; i++) if (g_spec[i].sig == h) { sp = &g_spec[i]; break; }
     if (!sp) return;
+#ifdef H4JP_TEST
     if (g_test) {   /* H4JP_TABMASK=hex: only the tables whose bit is set (test bisection) */
         char b[16];
         if (GetEnvironmentVariableA("H4JP_TABMASK", b, sizeof b) && !(strtoul(b, 0, 16) >> (sp - g_spec) & 1)) return;
     }
+#endif
     for (i = sp->first; i < nrows; i++) {
         mvec *r = &t->first[i];
         uint32_t c, nc;
@@ -176,11 +187,14 @@ static char __fastcall h_table(mtab *t, void *e, void *st)
 
 void str_hook_init(void)
 {
-    char p[MAX_PATH];
-    if (GetEnvironmentVariableA("H4JP_DUMP", p, sizeof p))
-        g_dumpf = CreateFileA(p, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+#ifdef H4JP_TEST
+    {   char p[MAX_PATH];
+        if (GetEnvironmentVariableA("H4JP_DUMP", p, sizeof p))
+            g_dumpf = CreateFileA(p, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+    }
     o_row = (read_row_t)make_tramp(0x879b50, 6);
     hook_jmp(0x879b50, h_row);
+#endif
     o_read = (read_string_t)make_tramp(0x879420, 6);
     hook_jmp(0x879420, h_read);
     /* %keyword scanner 0x74fb30: isalnum((signed char)c) counted EUC-JP bytes as keyword letters, so

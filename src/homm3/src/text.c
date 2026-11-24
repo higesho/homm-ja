@@ -3,7 +3,6 @@
 #include "h3jp.h"
 #include <string.h>
 #include <stdio.h>
-extern int g_test;
 
 typedef struct { uint64_t h; uint32_t off, len; } TEnt;
 static const TEnt *g_ent; static uint32_t g_n; static const char *g_blob;
@@ -104,6 +103,8 @@ static const MemTxt *mt_find(const char *name)
     for (i = 0; i < g_nmt; i++) if (!_stricmp(name, g_mt[i].name)) return &g_mt[i];
     return 0;
 }
+#ifdef H3JP_TEST
+/* 試験版だけ: H3JP_TEST=3 と H3JP_DUMP で、読み込んだ TXT を書き出す */
 static void dump_txt(const char *name, int size, const char *buf)
 {
     char dir[MAX_PATH], path[MAX_PATH]; FILE *f;
@@ -112,6 +113,9 @@ static void dump_txt(const char *name, int size, const char *buf)
     sprintf(path, "%s/%s", dir, name);
     f = fopen(path, "wb"); if (f) { fwrite(buf, 1, size, f); fclose(f); }
 }
+#else
+#define dump_txt(name, size, buf) ((void)0)
+#endif
 static void *__fastcall h_tbl(void *self, void *edx, const char *name, int size, const char *buf)
 {
     dump_txt(name, size, buf);

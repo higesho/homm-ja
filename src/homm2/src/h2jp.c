@@ -20,8 +20,13 @@ void proxy_init(void);
 
 /* ---------------------------------------------------------------- logging */
 static char g_dir[MAX_PATH];
-static FILE *g_log;
 static int g_logon;
+#ifndef H2JP_TEST
+/* 配布版: 記録は書かない */
+#define dbg(...) ((void)0)
+#else
+/* 試験版: 記録（log.txt）を書く */
+static FILE *g_log;
 static void dbg(const char *fmt, ...)
 {
     va_list ap;
@@ -37,6 +42,7 @@ static void dbg(const char *fmt, ...)
     va_end(ap);
     fflush(g_log);
 }
+#endif
 
 /* ------------------------------------------------- DOSBox internals */
 static uint32_t g_dbx, g_dbx_code;   /* Steam 0.74-3 = 0, GOG 0.74-2.1 = +0xe000 / -0x10, SVN = +0x3b000 / +0xbc0 */
@@ -802,7 +808,9 @@ static void init(HMODULE self)
     char la[MAX_PATH];
     HMODULE crt;
     InitializeCriticalSection(&g_cs);
-    if (GetEnvironmentVariableA("H2JP_OFF", la, MAX_PATH)) return;
+#ifdef H2JP_TEST
+    if (GetEnvironmentVariableA("H2JP_OFF", la, MAX_PATH)) return;   /* 試験版: 日本語化を止められる */
+#endif
     if (!GetEnvironmentVariableA("LOCALAPPDATA", la, MAX_PATH)) return;
     wsprintfA(g_dir, "%s\\H2JP", la);
     CreateDirectoryA(g_dir, NULL);

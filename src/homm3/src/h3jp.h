@@ -22,8 +22,14 @@ extern const Addrs *A;
 extern int g_hota;
 
 /* main.c */
+#ifdef H3JP_TEST
 extern int g_test;
 void logf_(const char *fmt, ...);
+#else
+/* 配布版: 試験の分岐と記録は持たない（コンパイラが消す） */
+#define g_test 0
+#define logf_(...) ((void)0)
+#endif
 void hook_jmp(uint32_t at, void *to);
 void *make_tramp(uint32_t at, int n);           /* copy n bytes from at + jmp back */
 const void *res_get(int id, DWORD *size);
@@ -46,11 +52,15 @@ const uint8_t *jp_glyph(int set, int code, int *w, int *h, int *bpr, int *adv);
 /* subs.c */
 void subs_init(void);
 
-/* testio.c */
-void test_init(void);
+/* main.c */
 void *iat_hook(const char *dll, const char *fn, void *nf);
 void *api_hook(const char *dll, const char *fn, void *nf);
 
-/* fakedd.c */
+#ifdef H3JP_TEST
+/* testio.c（試験版だけ） */
+void test_init(void);
+
+/* fakedd.c（試験版だけ） */
 void fakedd_init(void);
 int fakedd_shot(const char *path);
+#endif

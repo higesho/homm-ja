@@ -92,7 +92,7 @@ def click(x, y, right=False, double=False):
 def start(variant):
     dst = os.path.join(GAME, 'wsock32.dll')
     if os.path.exists(dst): os.remove(dst)
-    if variant == 'jp': shutil.copy(os.path.join(ROOT, 'build', 'wsock32.dll'), dst)
+    if variant == 'jp': shutil.copy(os.path.join(ROOT, 'build', 'test', 'wsock32.dll'), dst)   # 試験版（src/build.bat test で作る）
     env = dict(os.environ); env['H4JP_TEST'] = '1'; env['H4JP_LOG'] = os.path.join(ROOT, 'test', 'log.txt')
     p = subprocess.Popen([os.path.join(GAME, 'heroes4.exe')], cwd=GAME, env=env)
     open(PIDF, 'w').write(str(p.pid))

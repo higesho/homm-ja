@@ -70,7 +70,7 @@ def shot(name, scale=None):
     out = os.path.join(ROOT, 'capture', name + '.png'); im.save(out); print(out, im.size)
 def start():
     stop(quiet=True)
-    shutil.copy(os.path.join(ROOT, 'build', 'wsock32.dll'), os.path.join(GAME, 'wsock32.dll'))
+    shutil.copy(os.path.join(ROOT, 'build', 'test', 'wsock32.dll'), os.path.join(GAME, 'wsock32.dll'))   # 試験版（src/build.bat test で作る）
     env = dict(os.environ, H3JP_TEST=os.environ.get('H3JP_TEST','1'), H3JP_LOG=os.path.join(ROOT, 'work', 'h3jp.log'))
     p = subprocess.Popen([os.path.join(GAME, EXE)], cwd=GAME, env=env)
     open(os.path.join(ROOT, 'work', 'pid.txt'), 'w').write(str(p.pid))

@@ -5,8 +5,11 @@
 #include <stdarg.h>
 #include <string.h>
 
-int g_test;
 static HMODULE g_self;
+
+#ifdef H4JP_TEST
+/* 試験版だけ: H4JP_TEST で試験の仕組みを入れ、H4JP_LOG のファイルに記録を書く */
+int g_test;
 static FILE *g_log;
 static CRITICAL_SECTION g_logcs;
 
@@ -19,6 +22,7 @@ void logf_(const char *fmt, ...)
     fputc('\n', g_log); fflush(g_log);
     LeaveCriticalSection(&g_logcs);
 }
+#endif
 
 void patch_bytes(uint32_t at, const void *b, int n)
 {
@@ -94,13 +98,17 @@ static int check_exe(void)
 
 static void init(void)
 {
+#ifdef H4JP_TEST
     char b[16];
     g_test = GetEnvironmentVariableA("H4JP_TEST", b, sizeof b) > 0;
+#endif
     if (!check_exe()) { logf_("unknown heroes4.exe, staying English"); return; }
     text_init();
     str_hook_init();
     font_init();
+#ifdef H4JP_TEST
     if (g_test) test_init();
+#endif
     logf_("init done (test=%d)", g_test);
 }
 
@@ -122,11 +130,15 @@ STUB(0, p_getsockopt) STUB(1, p_recv) STUB(2, p_recvfrom) STUB(3, p_setsockopt)
 BOOL WINAPI DllMain(HINSTANCE h, DWORD r, LPVOID x)
 {
     if (r == DLL_PROCESS_ATTACH) {
-        char exe[MAX_PATH], *b, lb[MAX_PATH];
+        char exe[MAX_PATH], *b;
         g_self = h;
         DisableThreadLibraryCalls(h);
-        InitializeCriticalSection(&g_logcs);
-        if (GetEnvironmentVariableA("H4JP_LOG", lb, sizeof lb)) g_log = fopen(lb, "w");
+#ifdef H4JP_TEST
+        {   char lb[MAX_PATH];
+            InitializeCriticalSection(&g_logcs);
+            if (GetEnvironmentVariableA("H4JP_LOG", lb, sizeof lb)) g_log = fopen(lb, "w");
+        }
+#endif
         load_real();
         GetModuleFileNameA(0, exe, MAX_PATH);
         b = strrchr(exe, '\\'); b = b ? b + 1 : exe;

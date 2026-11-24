@@ -5,7 +5,7 @@ wsock32.dll の代理 DLL です。フォントの関数を差し替え、表・
 ## 組み立て方
 1. `python tools/extract.py` で英語の文を取り出す
 2. `python tools/make_tr.py` で訳の表、`python tools/make_font.py` でフォントを作る
-3. `sh tools/rebuild.sh` で build/wsock32.dll を作り、ゲームのフォルダに置く
+3. `sh tools/rebuild.sh` で build/wsock32.dll（配布版）を作り、ゲームのフォルダに置く。同時に試験版の build/test/wsock32.dll（`src\build.bat test` で作るもの。tools/win.py が使う。配布しない）もできる
 
 ## 用意するもの
 - Windows、Visual Studio 2022（cl・rc）、Python 3
